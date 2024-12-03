@@ -1,9 +1,6 @@
 def call() {
     pipeline {
         agent { label 'python_agent' }
-        environment {
-            TRIVY_GITHUB_TOKEN=credentials('trivy')
-        }
         parameters {
             booleanParam(defaultValue: false, description: 'Deploy to Production', name: 'DEPLOY')
         }
@@ -53,14 +50,18 @@ def call() {
                 }
             }
             stage ('Security Scan') {
+                environment {
+                    TRIVY_USR_PSW_TOKEN=credentials('trivy')
+                }
                 steps {
                     script {
-                        sh '''
+                        sh """
+                            export TRIVY_GITHUB_TOKEN=${TRIVY_USR_PSW_TOKEN_PSW}
                             trivy image receiver
                             trivy image storage
                             trivy image processing
                             trivy image analyzer
-                        '''
+                        """
                     }
                 }
             }
