@@ -92,7 +92,7 @@ def call() {
                     expression { params.DEPLOY }
                 }
                 steps {
-                    sshagent(credentials: ["${AWS_CREDENTIALS}"]) {
+                    sshagent(credentials: ['acit3855_ssh_access']) {
                         sh """
                             ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${AWS_CREDENTIALS_USR}@${AWS_HOST} '
                                 docker pull kodymills395/receiver:latest
