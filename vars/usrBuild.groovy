@@ -17,7 +17,7 @@ def call() {
                         sh 'ls -l venv'
 
                         // install trivy for image vulnerability scanning
-                        sh 'curl -sfL https://github.com/aquasecurity/trivy/releases/download/v0.24.0/trivy_0.24.0_Linux-64bit.tar.gz | tar xz -C /usr/local/bin'
+                        // sh 'curl -sfL https://github.com/aquasecurity/trivy/releases/download/v0.24.0/trivy_0.24.0_Linux-64bit.tar.gz | tar xz -C /usr/local/bin'
                     }
                 }
             }
