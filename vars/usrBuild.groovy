@@ -84,18 +84,24 @@ def call() {
                 }
             }
             stage ('Deploy') {
+                environment {
+                    AWS_HOST = 'ec2-18-206-137-36.compute-1.amazonaws.com'
+                    AWS_CREDENTIALS=credentials('acit3855_ssh_access')
+                }
                 when {
                     expression { params.DEPLOY }
                 }
                 steps {
-                    sshagent(credentials: ['acit3855_ssh_access']) {
-                        sh '''
-                            docker pull kodymills395/receiver:latest
-                            docker pull kodymills395/storage:latest
-                            docker pull kodymills395/processing:latest
-                            docker pull kodymills395/analyzer:latest
-                            docker compose -f acit3855-lab8/Deployment/docker-compose.yml up -d
-                        '''                    
+                    sshagent(credentials: ["${AWS_CREDENTIALS}"]) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${AWS_CREDENTIALS_USR}@${AWS_HOST} '
+                                docker pull kodymills395/receiver:latest
+                                docker pull kodymills395/storage:latest
+                                docker pull kodymills395/processing:latest
+                                docker pull kodymills395/analyzer:latest
+                                docker compose -f acit3855-lab8/Deployment/docker-compose.yml up -d
+                            '
+                        """                 
                     }
                 }
             }
