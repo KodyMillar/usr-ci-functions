@@ -51,16 +51,17 @@ def call() {
             }
             stage ('Security Scan') {
                 environment {
-                    TRIVY_USR_PSW_TOKEN=credentials('trivy')
+                    TRIVY_USR_PSW_TOKEN = credentials('trivy')
+                    TRIVY_CACHE_DIR = "${env.WORKSPACE}/.trivy_cache"
                 }
                 steps {
                     script {
                         sh """
                             export TRIVY_GITHUB_TOKEN=${TRIVY_USR_PSW_TOKEN_PSW}
-                            trivy image receiver
-                            trivy image storage
-                            trivy image processing
-                            trivy image analyzer
+                            trivy image --cache-dir ${TRIVY_CACHE_DIR} --no-update receiver
+                            trivy image --cache-dir ${TRIVY_CACHE_DIR} --no-update storage
+                            trivy image --cache-dir ${TRIVY_CACHE_DIR} --no-update processing
+                            trivy image --cache-dir ${TRIVY_CACHE_DIR} --no-update analyzer
                         """
                     }
                 }
