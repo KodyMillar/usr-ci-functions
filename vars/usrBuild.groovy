@@ -31,10 +31,10 @@ def call() {
                         sh 'venv/bin/pip install -r Analyzer/requirements.txt'
 
                         // build all the docker images
-                        sh 'build -t receiver Receiver/'
-                        sh 'built -t storage Storage/'
-                        sh 'build -t processing Processor/'
-                        sh 'build -t analyzer Analyzer/'
+                        sh 'docker build -t receiver Receiver/'
+                        sh 'docker build -t storage Storage/'
+                        sh 'docker build -t processing Processor/'
+                        sh 'docker build -t analyzer Analyzer/'
                     }
                 }
             }
