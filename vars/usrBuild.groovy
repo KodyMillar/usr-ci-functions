@@ -41,6 +41,7 @@ def call() {
             stage ('Lint') {
                 steps {
                     script {
+                        sh 'source venv/bin/activate' // Activates venv for pylint to recognize
                         sh 'pylint --fail-under 5 Receiver/*.py'
                         sh 'pylint --fail-under 5 Storage/*.py'
                         sh 'pylint --fail-under 5 Processor/*.py'
