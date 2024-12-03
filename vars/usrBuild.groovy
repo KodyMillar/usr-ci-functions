@@ -1,6 +1,9 @@
 def call() {
     pipeline {
         agent { label 'python_agent' }
+        environment {
+            TRIVY_GITHUB_TOKEN=credentials('trivy')
+        }
         parameters {
             booleanParam(defaultValue: false, description: 'Deploy to Production', name: 'DEPLOY')
         }
