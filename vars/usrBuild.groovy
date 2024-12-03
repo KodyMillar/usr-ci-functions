@@ -58,7 +58,7 @@ def call() {
                     script {
                         sh """
                             export TRIVY_GITHUB_TOKEN=${TRIVY_USR_PSW_TOKEN_PSW}
-                            trivy --cache-dir ${TRIVY_CACHE_DIR} image --skip-db-update receiver
+                            trivy --cache-dir ${TRIVY_CACHE_DIR} image receiver
                             trivy --cache-dir ${TRIVY_CACHE_DIR} image --skip-db-update storage
                             trivy --cache-dir ${TRIVY_CACHE_DIR} image --skip-db-update processing
                             trivy --cache-dir ${TRIVY_CACHE_DIR} image --skip-db-update analyzer
