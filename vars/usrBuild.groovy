@@ -1,4 +1,4 @@
-def call() {
+def call(service, serviceFolder) {
     pipeline {
         agent { label 'python_agent' }
         parameters {
@@ -25,16 +25,10 @@ def call() {
                 steps {
                     script {
                         // install all required python modules for each service
-                        sh 'venv/bin/pip install -r Receiver/requirements.txt'
-                        sh 'venv/bin/pip install -r Storage/requirements.txt'
-                        sh 'venv/bin/pip install -r Processor/requirements.txt'
-                        sh 'venv/bin/pip install -r Analyzer/requirements.txt'
+                        sh "venv/bin/pip install -r ${serviceFolder}/requirements.txt"
 
                         // build all the docker images
-                        sh 'docker build -t receiver Receiver/'
-                        sh 'docker build -t storage Storage/'
-                        sh 'docker build -t processing Processor/'
-                        sh 'docker build -t analyzer Analyzer/'
+                        sh "docker build -t ${service} ${serviceFolder}/"
                     }
                 }
             }
@@ -42,10 +36,7 @@ def call() {
                 steps {
                     script {
                         sh '. venv/bin/activate' // Activates venv for pylint to recognize
-                        sh 'pylint --fail-under 5 Receiver/*.py'
-                        sh 'pylint --fail-under 5 Storage/*.py'
-                        sh 'pylint --fail-under 5 Processor/*.py'
-                        sh 'pylint --fail-under 5 Analyzer/*.py'
+                        sh "pylint --fail-under 5 ${serviceFolder}/*.py"
                     }
                 }
             }
@@ -58,10 +49,7 @@ def call() {
                     script {
                         sh """
                             export TRIVY_GITHUB_TOKEN=${TRIVY_USR_PSW_TOKEN_PSW}
-                            trivy --cache-dir ${TRIVY_CACHE_DIR} image receiver
-                            trivy --cache-dir ${TRIVY_CACHE_DIR} image --skip-db-update storage
-                            trivy --cache-dir ${TRIVY_CACHE_DIR} image --skip-db-update processing
-                            trivy --cache-dir ${TRIVY_CACHE_DIR} image --skip-db-update analyzer
+                            trivy --cache-dir ${TRIVY_CACHE_DIR} image ${service}
                         """
                     }
                 }
@@ -69,17 +57,11 @@ def call() {
             stage ('Package') {
                 steps {
                     withCredentials([string(credentialsId: 'usr_dockerhub', variable: 'TOKEN')]) {
-                        sh '''
+                        sh """
                             docker login -u "kodymills395" -p "$TOKEN" docker.io
-                            docker image tag receiver kodymills395/receiver:latest
-                            docker image tag storage kodymills395/storage:latest
-                            docker image tag processing kodymills395/processing:latest
-                            docker image tag analyzer kodymills395/analyzer:latest 
-                            docker push kodymills395/receiver:latest
-                            docker push kodymills395/storage:latest
-                            docker push kodymills395/processing:latest
-                            docker push kodymills395/analyzer:latest
-                        '''
+                            docker image tag ${service} kodymills395/${service}:latest
+                            docker push kodymills395/${service}:latest
+                        """
                     }
                 }
             }
@@ -95,10 +77,7 @@ def call() {
                     sshagent(credentials: ['acit3855_ssh_access']) {
                         sh """
                             ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${AWS_CREDENTIALS_USR}@${AWS_HOST} '
-                                docker pull kodymills395/receiver:latest
-                                docker pull kodymills395/storage:latest
-                                docker pull kodymills395/processing:latest
-                                docker pull kodymills395/analyzer:latest
+                                docker pull kodymills395/${service}:latest
                                 docker compose -f acit3855-lab8/Deployment/docker-compose.yml up -d
                             '
                         """                 
