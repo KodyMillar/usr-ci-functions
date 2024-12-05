@@ -85,7 +85,7 @@ def call() {
             }
             stage ('Deploy') {
                 environment {
-                    AWS_HOST = 'ec2-18-206-137-36.compute-1.amazonaws.com'
+                    AWS_HOST = 'ec2-3-91-213-74.compute-1.amazonaws.com'
                     AWS_CREDENTIALS=credentials('acit3855_ssh_access')
                 }
                 when {
